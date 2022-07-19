@@ -72,11 +72,18 @@ for SYMB in SYMBs:
         df.to_csv('Stock_Growth/csv_files/temp.csv', mode ='a', header=False, index=False)
 
 # Sort data by ticker, date(descending)
+# csvData = pd.read_csv("Stock_Growth/csv_files/temp.csv")
+# csvData.sort_values(["ticker", "sort"], 
+#                     axis=0,
+#                     ascending=[True, False], 
+#                     inplace=True)
+# csvData.to_csv("Stock_Growth/csv_files/temp1.csv")
+
+# Sort by date WIP
 csvData = pd.read_csv("Stock_Growth/csv_files/temp.csv")
-csvData.sort_values(["ticker", "sort"], 
-                    axis=0,
-                    ascending=[True, False], 
-                    inplace=True)
+# csvData['timestamp'] = pd.to_datetime(csvData.date, infer_datetime_format = True)
+# csvData.sort_values(["ticker"],by = 'timestamp', ascending = True, inplace = True)
+csvData = sorted(csvData, key = lambda row: dt.datetime.strptime(row[1], "%Y-%m-%d"))
 csvData.to_csv("Stock_Growth/csv_files/temp1.csv")
 
 # Inflation USD - Pull and save inflation data for US as "temp_inf.csv"
