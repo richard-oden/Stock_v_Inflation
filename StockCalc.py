@@ -15,7 +15,7 @@ from sqlalchemy import true
 from api_keys import alpha_key
 
 # Delete csv files
-for folder, subfolders, files in os.walk('Stock_Growth/csv_files/'):        
+for folder, subfolders, files in os.walk('csv_files/'):        
     for file in files: 
         if file.endswith('.csv'): 
             path = os.path.join(folder, file) 
@@ -23,7 +23,7 @@ for folder, subfolders, files in os.walk('Stock_Growth/csv_files/'):
 
 header = ['sort', 'timestamp', 'open', 'high', 'low' , 'close' , 'adjusted close' , 'volume' , 'dividend amount' , 'ticker']
 
-with open('Stock_Growth/csv_files/temp.csv', 'w', encoding='UTF8') as f:
+with open('csv_files/temp.csv', 'w', encoding='UTF8') as f:
     writer1 = csv.writer(f)
 
     # write the header
@@ -58,36 +58,39 @@ for SYMB in SYMBs:
     # Pull csv and save as "temp_stk"
     stk = pd.read_csv("https://www.alphavantage.co/query?function=TIME_SERIES_MONTHLY_ADJUSTED&symbol=" + SYMB +"&apikey=" + alpha_key + "&datatype=csv")  
     stk.head()
-    stk.to_csv('Stock_Growth/csv_files/temp_stk.csv')
+    stk.to_csv('csv_files/temp_stk.csv')
 
     # Add column with stocks' ticker
     ticker = SYMB
-    add_column_in_csv('Stock_Growth/csv_files/temp_stk.csv', 'Stock_Growth/csv_files/temp_stk1.csv', lambda row, line_num: row.append(ticker))
+    add_column_in_csv('csv_files/temp_stk.csv', 'csv_files/temp_stk1.csv', lambda row, line_num: row.append(ticker))
 
     # Append each individual stock pull to master "temp.csv" file
-    csv_list = ['Stock_Growth/csv_files/temp_stk1.csv']
+    csv_list = ['csv_files/temp_stk1.csv']
    
     for csv_file in csv_list:
         df = pd.read_csv(csv_file)
-        df.to_csv('Stock_Growth/csv_files/temp.csv', mode ='a', header=False, index=False)
+        df.to_csv('csv_files/temp.csv', mode ='a', header=False, index=False)
 
 # Sort data by ticker, date(descending)
-# csvData = pd.read_csv("Stock_Growth/csv_files/temp.csv")
+# csvData = pd.read_csv("csv_files/temp.csv")
 # csvData.sort_values(["ticker", "sort"], 
 #                     axis=0,
 #                     ascending=[True, False], 
 #                     inplace=True)
-# csvData.to_csv("Stock_Growth/csv_files/temp1.csv")
+# csvData.to_csv("csv_files/temp1.csv")
 
 # Sort by date WIP
-csvData = pd.read_csv("Stock_Growth/csv_files/temp.csv")
+csvData = pd.read_csv("csv_files/temp.csv")
 # csvData['timestamp'] = pd.to_datetime(csvData.date, infer_datetime_format = True)
 # csvData.sort_values(["ticker"],by = 'timestamp', ascending = True, inplace = True)
-csvData = sorted(csvData, key = lambda row: dt.datetime.strptime(row[1], "%Y-%m-%d"))
-csvData.to_csv("Stock_Growth/csv_files/temp1.csv")
+
+csvData['timestamp'] = csvData['timestamp'].astype('datetime64[ns]')
+csvData.sort_values(by='timestamp', inplace=True)
+
+csvData.to_csv("csv_files/temp1.csv")
 
 # Inflation USD - Pull and save inflation data for US as "temp_inf.csv"
 infl = pd.read_csv("https://www.alphavantage.co/query?function=INFLATION&apikey=" + alpha_key + "&datatype=csv")   
 infl.head()
 
-infl.to_csv('Stock_Growth/csv_files/temp_inf.csv')
+infl.to_csv('csv_files/temp_inf.csv')
